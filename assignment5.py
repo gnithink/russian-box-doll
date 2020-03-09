@@ -3,6 +3,9 @@ Assignment 5
 Nithin Krishna Gowda
 Advanced Data Structures
 Application of Ford Fulkerson Algorithm
+The program can be executed in the terminal with the command:    
+
+cat inSample1.txt | python3 assignment5.py
 '''
 # Steps needed to be implemented:
 # Based on the input set of dimensions of boxes, building the bipartiate graph out of them
@@ -29,26 +32,65 @@ n_boxes =  int(data[0])
 box_dim = []
 for line in data:
     line = line.strip()
-    line = line.replace(" ", "") 
+    #line = line.replace(" ", "") 
     #print(line.isdigit())
-    if not line.isdigit():
-        print("each line should contain only integers", line)
-        print("exiting the for loop and the program")
-        break
+    # if not line.isdigit():
+    #     print("each line should contain only integers", line)
+    #     print("exiting the for loop and the program")
+    #     break
 
     
     box_dim.append(line)
 
+
 box_dim.pop(0)
+
+print("The original box dimensions in the form of a list are",box_dim)
 
 # stored the dimensions of all the boxes in a list
 # Need to write a function to rearrange the dimensions of each box in ascending order
 
-def rearrange(l_dim):
-    for i in range(len(l_dim)):
-        l_dim[i] = "".join(sorted(l_dim[i]))
+# function returns a list of numbers from a string separated by spaces
+def numbers_from_spaces(dim_string):
+    l_nums = []
+    num = ''
+    for i in dim_string:
+        if i == ' ':
+            l_nums.append(num)
+            num = ''
+        else:
+            num += i
+    l_nums.append(num)   
+    return l_nums
 
+#ans1 = numbers_from_spaces("11 13 6")
+#print(ans1)
+
+# Function to create a single string separated by spaces from a list
+def list_to_string(one_box_dim: list):
+    string_dim = ""
+    for i in one_box_dim:
+        string_dim += i
+        string_dim += ' '
+    string_dim = string_dim[0 : (len(string_dim)-1) ]
+    return string_dim
+
+#ans2 = list_to_string(["11", "13", "6"])
+#print(ans2)
+    
+
+def rearrange(l_dim):
+    for i in range( len(l_dim)):
+        l_dim[i] = numbers_from_spaces(l_dim[i])
+        l_dim[i] = [int(num_string) for num_string in l_dim[i]]
+        l_dim[i].sort()
+        l_dim[i] = [str(num) for num in l_dim[i]]
+        l_dim[i] = list_to_string(l_dim[i])    
     return l_dim
+
+#print(rearrange(box_dim))
+
+
 
 
 # Need to create a adjacency matrix out of all the boxes in the list and their dimensions
@@ -66,10 +108,11 @@ def adj_matrix(l_dim : list, n_boxes: int):
     for i in range(0, n_boxes):
         for j in range(0, n_boxes):
             #print("indexes", i, j)
-            b_main = l_dim[i]
-            b_rest = l_dim[j]
+            b_main_list = numbers_from_spaces(l_dim[i])
+            b_rest_list = numbers_from_spaces(l_dim[j])
             flag = False
-            for n,m in zip(b_main, b_rest):
+            # extracting numbers from spaces
+            for n,m in zip(b_main_list, b_rest_list):
                 #print(n,m)
                 if int(n) < int(m):
                     flag = True
@@ -97,7 +140,7 @@ def adj_matrix(l_dim : list, n_boxes: int):
     return matrix
 
 s_dim = rearrange(box_dim)
-print("The box dimensions in the form of a list are", s_dim)
+print("The box dimensions sorted and arranged in the form of a list are", s_dim)
 #print(box_dim)
 
 f_matrix = adj_matrix(s_dim, n_boxes)
@@ -160,8 +203,3 @@ class bipartite_matching():
 bpm_object = bipartite_matching(f_matrix)
 
 print("The number of visbible boxes is", bpm_object.max_bpm())
- 
-
-
-
-
